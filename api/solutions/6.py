@@ -8,7 +8,6 @@ from collections import Counter
 pp = pprint.PrettyPrinter(indent=4)
 
 def solve_part_one(file='../solutions/inputs/6.in'):
-
     return get_population_after(file, 80)
 
 def solve_part_two(file='../solutions/inputs/6.in'):
