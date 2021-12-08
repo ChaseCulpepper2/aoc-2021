@@ -2,10 +2,6 @@
 # https://adventofcode.com/2021/day/6#part2
 
 import os
-import pprint
-from collections import Counter
-
-pp = pprint.PrettyPrinter(indent=4)
 
 def solve_part_one(file='../solutions/inputs/7.in'):
     crabs = load_file(file)
