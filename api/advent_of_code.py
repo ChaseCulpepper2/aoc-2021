@@ -1,6 +1,5 @@
 from flask import Flask
-from flask_restful import Resource, Api, reqparse
-import werkzeug
+from flask_restful import Resource, Api, abort
 from apispec import APISpec
 from marshmallow import Schema, fields
 from apispec.ext.marshmallow import MarshmallowPlugin
@@ -27,24 +26,31 @@ class SolutionsResponseSchema(Schema):
     part_one = fields.Int()
     part_two = fields.Int()
 
-class SolutionsRequestSchema(Schema):
-    input = fields.Raw(type='file')
-
 #  Restful way of creating APIs through Flask Restful
-class AdventOfCodeSolutionAPI(MethodResource, Resource):
-    def __init__(self):
-        self.parser = reqparse.RequestParser()
-    
-    @doc(description='Get the Advent of Code solution', tags=['Solutions'])
-    @use_kwargs(SolutionsRequestSchema)
+class AdventOfCodeSolutionAPI(MethodResource, Resource):    
+    @doc(description='Get the Advent of Code solution based on input', tags=['Solutions'])
     @marshal_with(SolutionsResponseSchema)  # marshalling
-    def post(self, day):
-        self.parser.add_argument('input', type=werkzeug.datastructures.FileStorage, location='files')
-        return get_solution(day)
+    def get(self, day):
+        try:
+            return get_solution(day)
+        except ImportError:
+            abort(404)
+
+class AdventOfCodeTestSolutionAPI(MethodResource, Resource):    
+    @doc(description='Get the Advent of Code solution based on example input', tags=['Solutions'])
+    @marshal_with(SolutionsResponseSchema)  # marshalling
+    def get(self, day):
+        try:
+            return get_solution(day, test=True)
+        except ImportError:
+            abort(404)
 
 
 api.add_resource(AdventOfCodeSolutionAPI, '/solution/<int:day>')
+api.add_resource(AdventOfCodeTestSolutionAPI, '/solution/<int:day>/test')
+
 docs.register(AdventOfCodeSolutionAPI)
+docs.register(AdventOfCodeTestSolutionAPI)
 
 if __name__ == '__main__':
     app.run(debug=True)
